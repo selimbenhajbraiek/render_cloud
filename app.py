@@ -5,16 +5,24 @@ import os
 
 app = Flask(__name__)
 
-@app.route("/live/vehicles")
+from flask import Flask, jsonify, request
+from datetime import datetime
+
+app = Flask(__name__)
+
+mock_data = []
+
+@app.route("/live/vehicles", methods=["GET"])
 def get_vehicles():
-    vehicles = []
-    for _ in range(10):
-        vehicles.append({
-            "type": random.choice(["BUS", "TRAM", "TRAIN", "SUBWAY", "FERRY"]),
-            "station_id": random.randint(1, 15),
-            "timestamp": (datetime.now() - timedelta(minutes=random.randint(0, 300))).isoformat()
-        })
-    return jsonify(vehicles)
+    return jsonify(mock_data)
+
+@app.route("/live/vehicles", methods=["POST"])
+def add_vehicle():
+    vehicle = request.json
+    vehicle["timestamp"] = vehicle.get("timestamp") or datetime.now().isoformat()
+    mock_data.append(vehicle)
+    return jsonify({"message": "Vehicle added", "vehicle": vehicle})
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render provides PORT automatically
